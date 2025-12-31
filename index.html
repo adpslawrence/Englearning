@@ -3,8 +3,60 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>國中英語 1200 單字全能王</title>
+<title>國中英語 1200 單字全能王 (防護版)</title>
+<script>
+    // --- 核心防護機制 (Anti-Copy Core) ---
+    (function() {
+        // 1. 禁用右鍵選單
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // 2. 禁用常用快捷鍵 (F12, Ctrl+U, Ctrl+S, Ctrl+C, Ctrl+Shift+I 等)
+        document.addEventListener('keydown', function(e) {
+            // F12
+            if (e.keyCode == 123) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+I (開發者工具), Ctrl+Shift+J (控制台), Ctrl+Shift+C (元素選擇)
+            if (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+U (查看原始碼)
+            if (e.ctrlKey && e.keyCode == 85) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+S (存檔)
+            if (e.ctrlKey && e.keyCode == 83) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+A (全選), Ctrl+C (複製)
+            if (e.ctrlKey && (e.keyCode == 65 || e.keyCode == 67)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // 3. 簡單的開發者工具干擾 (Debugger Loop)
+        // 這會讓嘗試打開控制台的人卡在斷點循環中
+        setInterval(function() {
+            var startTime = performance.now();
+            debugger;
+            var endTime = performance.now();
+            if (endTime - startTime > 100) {
+                // 偵測到開發者工具開啟
+                document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#000;color:red;font-size:2rem;font-weight:bold;">非法存取：請關閉開發者工具</div>';
+            }
+        }, 1000);
+    })();
+</script>
 <style>
+    /* --- CSS 防護層 --- */
     :root {
         --primary: #6c5ce7;
         --primary-dark: #4834d4;
@@ -17,6 +69,20 @@
         --error: #d63031;
         --shadow: 0 8px 30px rgba(0,0,0,0.12);
         --radius: 16px;
+    }
+
+    /* 全局禁止選取與拖曳 */
+    html, body {
+        -webkit-user-select: none; /* Chrome/Safari */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* IE10+ */
+        user-select: none; /* Standard */
+        -webkit-touch-callout: none; /* iOS Safari */
+    }
+
+    img {
+        pointer-events: none; /* 禁止圖片互動 */
+        -webkit-user-drag: none; /* 禁止拖曳 */
     }
 
     [data-theme="dark"] {
@@ -39,7 +105,6 @@
         margin: 0;
         padding: 0;
         text-align: center;
-        user-select: none;
         padding-bottom: 80px;
         transition: background-color 0.3s, color 0.3s;
         overscroll-behavior-y: none; /* Prevent pull-to-refresh on mobile */
@@ -157,13 +222,42 @@
         border: 2px solid #ddd; border-radius: 50px; margin-bottom: 15px;
         background: var(--bg); color: var(--text); outline: none;
         transition: border-color 0.2s;
+        /* Allow typing */
+        -webkit-user-select: text;
+        user-select: text;
     }
     .search-bar:focus { border-color: var(--primary); }
-    .alpha-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 5px; margin-bottom: 10px; scrollbar-width: none; }
+    
+    /* MODIFIED: Responsive Alpha Scroll */
+    .alpha-scroll { 
+        display: flex; 
+        gap: 8px; 
+        padding: 5px; 
+        margin-bottom: 10px; 
+        /* Default (Desktop): Wrap to show all */
+        flex-wrap: wrap; 
+        justify-content: center; 
+    }
+
+    /* Mobile: Use horizontal scroll when screen < 768px */
+    @media (max-width: 768px) {
+        .alpha-scroll {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            justify-content: flex-start;
+            scrollbar-width: none; /* Firefox */
+            -webkit-overflow-scrolling: touch;
+        }
+        .alpha-scroll::-webkit-scrollbar { 
+            display: none; /* Chrome/Safari/Webkit */
+        }
+    }
+    
     .alpha-btn {
         min-width: 40px; height: 40px; border-radius: 12px; background: var(--bg);
         color: var(--text); display: flex; align-items: center; justify-content: center;
         font-weight: bold; cursor: pointer; transition: 0.2s; border: 1px solid transparent;
+        flex: 0 0 auto; /* Ensure size */
     }
     .alpha-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
     .dict-list { list-style: none; padding: 0; max-height: 50vh; overflow-y: auto; text-align: left; }
@@ -201,6 +295,8 @@
         text-align: left; line-height: 2; font-size: 1.25rem;
         background: var(--bg); padding: 20px; border-radius: 12px;
         max-height: 50vh; overflow-y: auto; margin-bottom: 20px;
+        -webkit-user-select: none; /* No copy text */
+        user-select: none;
     }
     .clickable { cursor: pointer; padding: 0 2px; border-radius: 4px; }
     .clickable:active { background: var(--secondary); color: var(--text); }
@@ -241,7 +337,7 @@
     #confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
 </style>
 </head>
-<body data-theme="light">
+<body data-theme="light" oncontextmenu="return false" onselectstart="return false" ondragstart="return false">
 
 <div id="toast-container"></div>
 <canvas id="confettiCanvas"></canvas>
@@ -380,11 +476,11 @@
         <h2>短文閱讀</h2>
         
         <div class="category-nav">
-            <button class="cat-btn" onclick="selectCategory('family')">家庭</button>
-            <button class="cat-btn" onclick="selectCategory('travel')">旅遊</button>
-            <button class="cat-btn" onclick="selectCategory('animals')">動物</button>
-            <button class="cat-btn" onclick="selectCategory('school')">學校</button>
-            <button class="cat-btn" onclick="selectCategory('food')">食物</button>
+            <button class="cat-btn" onclick="selectCategory('family')" style="margin:2px;">家庭</button>
+            <button class="cat-btn" onclick="selectCategory('travel')" style="margin:2px;">旅遊</button>
+            <button class="cat-btn" onclick="selectCategory('animals')" style="margin:2px;">動物</button>
+            <button class="cat-btn" onclick="selectCategory('school')" style="margin:2px;">學校</button>
+            <button class="cat-btn" onclick="selectCategory('food')" style="margin:2px;">食物</button>
         </div>
 
         <div id="storyListArea"></div>
@@ -871,7 +967,7 @@ function initScramble() {
     currWord = pool[Math.floor(Math.random()*pool.length)];
     // Ensure complexity
     while(currWord.sentence.split(" ").length < 3) {
-         currWord = pool[Math.floor(Math.random()*pool.length)];
+          currWord = pool[Math.floor(Math.random()*pool.length)];
     }
     
     let sent = currWord.sentence.replace(/[.,?!]/g,""); 
